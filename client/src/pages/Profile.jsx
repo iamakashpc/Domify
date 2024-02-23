@@ -105,15 +105,17 @@ const Profile = () => {
 		try {
 			dispatch(signOutStart());
 			const res = await fetch("/api/auth/signout");
-			if (!res.ok) {
-				throw new Error("Failed to sign out");
+			const data = await res.json();
+			if (data.success === false) {
+				dispatch(signOutFailure(data.message));
+				return;
 			}
+
 			dispatch(signOutSuccess());
 		} catch (error) {
 			dispatch(signOutFailure(error.message));
 		}
 	};
-
 	return (
 		<div className="p-3 max-w-sm mx-auto">
 			<h1 className="text-3xl font-semibold text-center my-5">Profile Info</h1>
@@ -128,8 +130,8 @@ const Profile = () => {
 				<img
 					onClick={() => fileRef.current.click()}
 					src={formData.avatar || currentUser.avatar}
-					alt="profile"
-					className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
+					alt="ProfilePic"
+					className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2 border"
 				/>
 				<p className="text-sm self-center">
 					{fileUploadError ? (
