@@ -14,10 +14,13 @@ import {
 	deleteUserFailure,
 	deleteUserStart,
 	deleteUserSuccess,
+	signOutStart,
+	signOutFailure,
+	signOutSuccess,
 } from "../redux/user/userSlice";
 const Profile = () => {
 	const fileRef = useRef(null);
-	const { currentUser,loading,error } = useSelector((state) => state.user);
+	const { currentUser, loading, error } = useSelector((state) => state.user);
 	const [file, setFile] = useState(undefined);
 	const [filePerc, setFilePerc] = useState(0);
 	const [fileUploadError, setFileUploadError] = useState(false);
@@ -45,7 +48,7 @@ const Profile = () => {
 				setFilePerc(Math.round(progress));
 			},
 			(error) => {
-        console.log("Error Uploading File: ", error);
+				console.log("Error Uploading File: ", error);
 				setFileUploadError(true);
 			},
 			() => {
@@ -98,6 +101,19 @@ const Profile = () => {
 			dispatch(deleteUserFailure(error.message));
 		}
 	};
+	const handleSignOut = async () => {
+		try {
+			dispatch(signOutStart());
+			const res = await fetch("/api/auth/signout");
+			if (!res.ok) {
+				throw new Error("Failed to sign out");
+			}
+			dispatch(signOutSuccess());
+		} catch (error) {
+			dispatch(signOutFailure(error.message));
+		}
+	};
+
 	return (
 		<div className="p-3 max-w-sm mx-auto">
 			<h1 className="text-3xl font-semibold text-center my-5">Profile Info</h1>
@@ -165,7 +181,10 @@ const Profile = () => {
 				>
 					Delete account
 				</span>
-				<span className="text-blue-900 cursor-pointer font-semibold">
+				<span
+					onClick={handleSignOut}
+					className="text-blue-900 cursor-pointer font-semibold"
+				>
 					Sign Out
 				</span>
 			</div>
