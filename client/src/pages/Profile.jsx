@@ -6,7 +6,7 @@ import {
 	ref,
 	uploadBytesResumable,
 } from "firebase/storage";
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom";
 import { app } from "../firebase/firebase";
 import {
 	updateUserStart,
@@ -134,6 +134,24 @@ const Profile = () => {
 			setShowListingsError(true);
 		}
 	};
+	const handleListingDelete = async (listingId) => {
+		try {
+			const res = await fetch(`/api/listing/delete/${listingId}`, {
+				method: "DELETE",
+			});
+			const data = await res.json();
+			if (data.success === false) {
+				console.log(data.message);
+				return;
+			}
+
+			setUserListings((prev) =>
+				prev.filter((listing) => listing._id !== listingId)
+			);
+		} catch (error) {
+			console.log(error.message);
+		}
+	};
 	return (
 		<div className="p-3 max-w-sm mx-auto">
 			<h1 className="text-3xl font-semibold text-center my-5">Profile Info</h1>
@@ -250,7 +268,12 @@ const Profile = () => {
 							</Link>
 
 							<div className="flex flex-col item-center">
-								<button className="text-red-700 uppercase">Delete</button>
+								<button
+									onClick={() => handleListingDelete(listing._id)}
+									className="text-red-700 uppercase"
+								>
+									Delete
+								</button>
 								<button className="text-green-700 uppercase">Edit</button>
 							</div>
 						</div>
